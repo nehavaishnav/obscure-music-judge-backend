@@ -4,13 +4,13 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import spotifyRoutes from "./routes/spotify.js";
 import aiRoutes from "./routes/ai.js";
-app.use("/ai", aiRoutes);
 
 dotenv.config();
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/ai", aiRoutes);
 
 app.use("/auth", authRoutes);
 app.use("/spotify", spotifyRoutes);
