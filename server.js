@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import spotifyRoutes from "./routes/spotify.js";
+import aiRoutes from "./routes/ai.js";
+app.use("/ai", aiRoutes);
 
 dotenv.config();
 const app = express();
