@@ -1,34 +1,46 @@
 import express from "express";
+import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+dotenv.config();
 const router = express.Router();
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY, { apiVersion: 'v1' });
 router.post("/analyze", async (req, res) => {
-  const { tracks, artists } = req.body;
-  
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log("🟢 /ai/analyze route hit!");
+    console.log("📦 req.body =", req.body);
+
+    const { songs } = req.body || {};
+    if (!songs || !Array.isArray(songs)) {
+      console.log("❌ songs is missing or not an array");
+      return res.status(400).json({ error: "songs must be an array" });
+    }
 
     const prompt = `
-    Analyze this Spotify user's taste in music.
-    Be funny, brutally honest, and savage — but not offensive.
-    Use creative humor, sarcasm, and cultural references.
+You're a savage indian critic that has social media humour and is dank
+Analyze this user's music taste from these songs:
+${songs.join(", ")}.
 
-    Top Artists:
-    ${artists.map(a => a.name).join(", ")}
+Give a clever, brutally honest, and entertaining roast  but in short words in 150 words only also use hignlish and desi slangs 
+`;
 
-    Top Tracks:
-    ${tracks.map(t => t.name + " by " + t.artists[0].name).join(", ")}
-    `;
+    console.log("⚡ Sending request to Gemini...");
+
+    // ✅ Use correct model name and method
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const result = await model.generateContent(prompt);
-    const roast = result.response.text();
+    const text = result.response.text();
 
-    res.json({ roast });
-  } catch (err) {
-    console.error("Gemini error:", err);
-    res.status(500).json({ error: "AI generation failed" });
+    console.log("✅ Gemini Response:", text);
+    res.json({ text });
+  } catch (error) {
+    console.error("🔥 Caught error:", error);
+    res.status(500).json({
+      text: "Couldn't generate analysis 😬",
+      error: error.message,
+    });
   }
 });
 

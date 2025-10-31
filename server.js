@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/ai", aiRoutes);
 
+
 app.use("/auth", authRoutes);
 app.use("/spotify", spotifyRoutes);
 
